@@ -7,6 +7,7 @@
 
 [![GitHub
 tag](https://img.shields.io/github/v/tag/VP-biostat/comorbidPGS.svg?label=latest%20version)](https://github.com/VP-biostat/comorbidPGS)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/comorbidPGS)](https://cran.r-project.org/package=comorbidPGS)
 <!-- badges: end -->
 
 comorbidPGS is a tool for analysing an already computed Polygenic Score
@@ -25,17 +26,24 @@ download.
 
 ## Installation
 
-You can install the development version of comorbidPGS from
-[GitHub](https://github.com/VP-biostat/comorbidPGS) with:
+comorbidPGS is available on CRAN, you can download it using the
+following command:
 
 ``` r
-# install.packages("devtools")
+install.packages("comorbidPGS")
+```
+
+If you prefer the latest stable development version, you can download it
+from [GitHub](https://github.com/VP-biostat/comorbidPGS) with:
+
+``` r
+if (!require("devtools", quietly = TRUE)) install.packages("devtools")
 devtools::install_github("VP-biostat/comorbidPGS")
 ```
 
 ## Example
 
-### Building an Association Table
+### Building an Association Table of PGS
 
 This is a basic example which shows you how to do basic association with
 the example dataset:
@@ -43,8 +51,8 @@ the example dataset:
 ``` r
 library(comorbidPGS)
 #> 
-#> Attachement du package : 'comorbidPGS'
-#> L'objet suivant est masqué depuis 'package:graphics':
+#> Attaching package: 'comorbidPGS'
+#> The following object is masked from 'package:graphics':
 #> 
 #>     assocplot
 
@@ -91,7 +99,35 @@ result_2 <- multiassoc(df = dataset, assoc_table = assoc, covar = c("age", "sex"
 | 16  | t2d_PGS | sbp_cat          | Ordered Categorical | Ordinal logistic regression     | age+sex+gen_array |      NA |         NA | 10000 | 1.0628744 |        NA | 1.0236044 | 1.1036509 | 0.0015002 |
 | 17  | ldl_PGS | sbp_cat          | Ordered Categorical | Ordinal logistic regression     | age+sex+gen_array |      NA |         NA | 10000 | 1.0078855 |        NA | 0.9707330 | 1.0464598 | 0.6818849 |
 
-### Examples of plot
+### Extension of association analysis: one-sample MR using the Wald Ratio and 2SLS methods
+
+``` r
+# MR using Wald ratio method
+mr1 <- mr_ratio(df = dataset, prs_col = "ldl_PGS", exposure_col = "log_ldl", outcome_col = "sbp") 
+#> Warning in phenotype_type(df = df, phenotype_col = exposure_col): Phenotype
+#> column log_ldl is continuous and not normal, please normalise prior association
+#> Warning in phenotype_type(df = df, phenotype_col = outcome_col): Phenotype
+#> column sbp is continuous and not normal, please normalise prior association
+```
+
+|         | PGS     | Exposure | Outcome | Method | N_cases | N_controls |     N | MR_estimate |       SE |  F_stat |
+|:--------|:--------|:---------|:--------|:-------|:--------|:-----------|------:|------------:|---------:|--------:|
+| ldl_PGS | ldl_PGS | log_ldl  | sbp     | Ratio  | NA      | NA         | 10000 |   0.0321099 | 2.387691 | 1449.37 |
+
+``` r
+# MR using 2-stage least square method (2SLS)
+mr2 <- mr_2sls(df = dataset, prs_col = "ldl_PGS", exposure_col = "log_ldl", outcome_col = "sbp") 
+#> Warning in phenotype_type(df = df, phenotype_col = exposure_col): Phenotype
+#> column log_ldl is continuous and not normal, please normalise prior association
+#> Warning in phenotype_type(df = df, phenotype_col = outcome_col): Phenotype
+#> column sbp is continuous and not normal, please normalise prior association
+```
+
+|       | PGS     | Exposure | Outcome | Method | N_cases | N_controls |     N | MR_estimate |       SE |  F_stat |
+|:------|:--------|:---------|:--------|:-------|:--------|:-----------|------:|------------:|---------:|--------:|
+| value | ldl_PGS | log_ldl  | sbp     | 2SLS   | NA      | NA         | 10000 |   0.0321099 | 2.387532 | 1449.37 |
+
+### Examples of data visualisation using comorbidPGS
 
 ``` r
 densityplot(dataset, prs_col = "ldl_PGS", phenotype_col = "sbp_cat")
@@ -118,7 +154,7 @@ score_table should have the assoc() output format
 centileplot(dataset, prs_col = "brc_PGS", phenotype_col = "brc")
 #> Warning in centileplot(dataset, prs_col = "brc_PGS", phenotype_col = "brc"):
 #> The dataset has less than 10,000 individuals, centiles plot may not look good!
-#> Use the argument decile = T to adapt to small datasets
+#> Use the argument decile = TRUE to adapt to small datasets
 ```
 
 <img src="man/figures/README-centileplot-1.png" width="100%" />
@@ -142,11 +178,11 @@ decileboxplot(dataset, prs_col = "ldl_PGS", phenotype_col = "ldl")
 
 ## Citation
 
-If you use comorbidPGS in any published work, please cite the following
-manuscript:
-
+To cite comorbidPGS in publications, please use:
 <p>
-Pascat V (????). <em>comorbidPGS: Assessing the shared predisposition
-between Phenotypes using Polygenic Scores (PGS, or PRS/GRS for binary
-outcomes)</em>. R package version 0.3.9000.
+Pascat V, Zudina L, Ulrich A, Maina JG, Kaakinen M, Pupko I, Bonnefond
+A, Demirkan A, Balkhiyarova Z, Froguel P, Prokopenko I (2024).
+“comorbidPGS: an R package assessing shared predisposition between
+Phenotypes using Polygenic Scores.” <em>Human Heredity</em>. doi:
+<a href="https://doi.org/10.1159/000539325">10.1159/000539325</a>.
 </p>

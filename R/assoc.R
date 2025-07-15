@@ -2,8 +2,8 @@
 #' Association of a PGS distribution with a Phenotype
 #'
 #' @description
-#' `assoc()` take a distribution of PGS, a Phenotype and eventual Confounders
-#' return a data frame showing the association of PGS on the Phenotype
+#' `assoc()` takes a distribution of PGS, a Phenotype and eventual Confounders.
+#' Returns a data frame showing the association of PGS on the Phenotype
 #'
 #' @param df a dataframe with individuals on each row, and at least the following
 #' columns:
@@ -109,7 +109,7 @@ assoc <- function(df = NULL, prs_col = "SCORESUM", phenotype_col = "Phenotype",
   # doing regression according to phenotype type
   if (phenotype_type == "Cases/Controls") {
     stat_method <- 'Binary logistic regression'
-    regress <- glm(regress_formula, family = "binomial"(link = "logit"), data = df)
+    regress <- glm(regress_formula, family = stats::binomial(link = "logit"), data = df)
   } else if (phenotype_type == "Ordered Categorical") {
     stat_method <- 'Ordinal logistic regression'
     regress <- polr(regress_formula, method = c("logistic"), data = df, Hess = TRUE)
